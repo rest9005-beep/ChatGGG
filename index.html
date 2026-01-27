@@ -1,261 +1,1633 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusChat | Современный мессенджер</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OfflineTube — YouTube clone</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f0f10;
+      --panel: #16181c;
+      --panel-2: #1f2229;
+      --text: #f5f5f7;
+      --muted: #b6bbc5;
+      --accent: #ff4d67;
+      --accent-2: #5aa9ff;
+      --green: #42d392;
+      --border: #2b2f36;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+      background: transparent;
+      border: none;
+      outline: none;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+    }
+
+    header {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #ff4d67, #ff9f5a);
+      border-radius: 12px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .search-bar {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--panel-2);
+      padding: 8px 12px;
+      border-radius: 999px;
+      margin: 0 24px;
+      border: 1px solid transparent;
+    }
+
+    .search-bar input {
+      flex: 1;
+    }
+
+    .search-bar:focus-within {
+      border-color: var(--accent-2);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      background: var(--panel-2);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--accent-2);
+      color: var(--accent-2);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: #111;
+      font-weight: 600;
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.1);
+      color: #111;
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .sidebar {
+      padding: 24px;
+      border-right: 1px solid var(--border);
+      background: var(--panel);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .nav-link.active, .nav-link:hover {
+      background: var(--panel-2);
+      color: var(--accent-2);
+    }
+
+    .content {
+      padding: 24px 32px 64px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .video-card {
+      background: var(--panel);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .video-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .video-thumb {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-info {
+      padding: 12px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .video-meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .filters select, .filters input {
+      background: var(--panel-2);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .watch-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .player {
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .player video, .player iframe {
+      width: 100%;
+      border-radius: 12px;
+      background: #000;
+      min-height: 360px;
+    }
+
+    .player-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .comment-box, .comment-list {
+      margin-top: 20px;
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .comment {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comment:last-child {
+      border-bottom: none;
+    }
+
+    .comment .meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .channel-hero {
+      background: linear-gradient(135deg, rgba(90,169,255,0.25), rgba(255,77,103,0.25));
+      border-radius: var(--radius);
+      padding: 20px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .tab {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--panel-2);
+    }
+
+    .tab.active {
+      border-color: var(--accent-2);
+      color: var(--accent-2);
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .list-item {
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--panel);
+      padding: 24px;
+      border-radius: 16px;
+      width: min(520px, 90vw);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 16px;
+    }
+
+    .form-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .form-field input, .form-field textarea, .form-field select {
+      background: var(--panel-2);
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--panel-2);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .badge {
+      background: var(--accent-2);
+      color: #111;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 960px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-link {
+        white-space: nowrap;
+      }
+      .watch-layout {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .search-bar {
+        margin: 0;
+        flex: 1 1 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="app" class="light-theme">
-        <!-- Экран авторизации/регистрации -->
-        <div id="auth-screen" class="screen active">
-            <div class="auth-container glass">
-                <div class="auth-header">
-                    <h1 class="logo">
-                        <i class="fas fa-comment-dots"></i> NexusChat
-                    </h1>
-                    <p class="auth-subtitle">Современный мессенджер для общения</p>
-                </div>
-                
-                <form id="auth-form" class="auth-form">
-                    <div class="form-toggle">
-                        <button type="button" class="toggle-btn active" data-mode="login">Вход</button>
-                        <button type="button" class="toggle-btn" data-mode="register">Регистрация</button>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="username">Имя пользователя</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-at"></i>
-                            <input type="text" id="username" name="username" placeholder="@username" required>
-                        </div>
-                        <div id="username-error" class="error-message"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password">Пароль</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="password" name="password" placeholder="Минимум 6 символов" required minlength="6">
-                        </div>
-                        <div id="password-error" class="error-message"></div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-block" id="auth-submit">
-                        <span class="btn-text">Войти в аккаунт</span>
-                        <i class="fas fa-spinner fa-spin hidden"></i>
-                    </button>
-                    
-                    <div id="auth-message" class="auth-message"></div>
-                </form>
-                
-                <div class="auth-footer">
-                    <p class="demo-info">
-                        <i class="fas fa-info-circle"></i> Для тестирования используйте @user1 / password123 или создайте новый аккаунт
-                    </p>
-                </div>
-            </div>
+  <div class="app" id="app">
+    <header>
+      <div class="logo">
+        <span class="logo-badge">▶</span>
+        <span>OfflineTube</span>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="global-search" placeholder="Поиск видео, каналов, тегов">
+        <button class="btn ghost" id="search-btn">Поиск</button>
+      </div>
+      <div class="header-actions">
+        <button class="btn" id="upload-btn">Загрузить</button>
+        <button class="btn" id="notifications-btn">🔔 <span id="notif-count" class="badge hidden">0</span></button>
+        <button class="btn" id="auth-btn">Войти</button>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="nav-link active" data-route="home">🏠 Главная</div>
+      <div class="nav-link" data-route="subscriptions">📺 Подписки</div>
+      <div class="nav-link" data-route="playlists">🎵 Плейлисты</div>
+      <div class="nav-link" data-route="history">🕒 История</div>
+    </aside>
+
+    <main class="content">
+      <section id="home" class="section active">
+        <div class="section-title">
+          <h2>Рекомендации</h2>
+          <div class="filters">
+            <select id="home-sort">
+              <option value="new">Сначала новые</option>
+              <option value="popular">Популярные</option>
+            </select>
+          </div>
         </div>
-        
-        <!-- Основной интерфейс мессенджера -->
-        <div id="main-screen" class="screen">
-            <div class="app-container">
-                <!-- Боковая панель с поиском и списком чатов -->
-                <div class="sidebar">
-                    <!-- Шапка боковой панели с профилем -->
-                    <div class="sidebar-header glass">
-                        <div class="user-profile-preview">
-                            <div class="avatar-small" id="current-user-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="user-info">
-                                <h3 id="current-username">@username</h3>
-                                <p class="user-status online">В сети</p>
-                            </div>
-                            <button id="settings-toggle" class="icon-btn" title="Настройки">
-                                <i class="fas fa-cog"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- Поиск пользователей -->
-                        <div class="search-container">
-                            <div class="input-with-icon">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="user-search" placeholder="Найти пользователя...">
-                            </div>
-                            <div id="search-results" class="search-results glass hidden"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Список чатов -->
-                    <div class="chats-container">
-                        <div class="chats-header">
-                            <h3><i class="fas fa-comments"></i> Чаты</h3>
-                            <span id="chats-count" class="badge">0</span>
-                        </div>
-                        <div id="chats-list" class="chats-list">
-                            <!-- Чаты будут загружены здесь -->
-                            <div class="empty-chats">
-                                <i class="fas fa-comment-slash"></i>
-                                <p>У вас пока нет чатов</p>
-                                <p class="small-text">Начните общение, найдя пользователя через поиск</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Основная область чата -->
-                <div class="main-content">
-                    <!-- Шапка чата с информацией о собеседнике -->
-                    <div id="chat-header" class="chat-header glass hidden">
-                        <div class="chat-partner-info">
-                            <div class="avatar-small" id="chat-partner-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <h3 id="chat-partner-name">@username</h3>
-                                <p id="chat-partner-status" class="user-status">был(а) недавно</p>
-                            </div>
-                        </div>
-                        <button id="clear-chat" class="icon-btn text-btn" title="Очистить историю">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- Область сообщений -->
-                    <div id="messages-container" class="messages-container">
-                        <div id="messages-list" class="messages-list">
-                            <!-- Сообщения будут загружены здесь -->
-                            <div class="welcome-message">
-                                <div class="welcome-icon">
-                                    <i class="fas fa-comments"></i>
-                                </div>
-                                <h2>Добро пожаловать в NexusChat!</h2>
-                                <p>Выберите чат из списка или начните новый диалог</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Форма отправки сообщения -->
-                        <div id="message-form-container" class="message-form-container glass hidden">
-                            <form id="message-form">
-                                <div class="input-with-icon">
-                                    <i class="fas fa-paper-plane"></i>
-                                    <input type="text" id="message-input" placeholder="Введите сообщение..." autocomplete="off">
-                                    <button type="submit" class="icon-btn send-btn" title="Отправить">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Панель настроек -->
-                <div id="settings-panel" class="settings-panel glass hidden">
-                    <div class="settings-header">
-                        <h3><i class="fas fa-cog"></i> Настройки</h3>
-                        <button id="close-settings" class="icon-btn">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="settings-content">
-                        <!-- Профиль -->
-                        <div class="settings-section">
-                            <h4><i class="fas fa-user"></i> Профиль</h4>
-                            
-                            <div class="profile-banner-preview" id="banner-preview">
-                                <button id="change-banner" class="edit-overlay">
-                                    <i class="fas fa-camera"></i> Сменить баннер
-                                </button>
-                            </div>
-                            
-                            <div class="profile-avatar-section">
-                                <div class="avatar-large" id="avatar-preview">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <button id="change-avatar" class="btn btn-outline">
-                                    <i class="fas fa-camera"></i> Сменить аватар
-                                </button>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="profile-username">Имя пользователя</label>
-                                <div class="input-with-icon">
-                                    <i class="fas fa-at"></i>
-                                    <input type="text" id="profile-username" value="@username">
-                                </div>
-                                <div id="profile-username-error" class="error-message"></div>
-                            </div>
-                            
-                            <button id="save-profile" class="btn btn-primary btn-block">
-                                <i class="fas fa-save"></i> Сохранить изменения
-                            </button>
-                        </div>
-                        
-                        <!-- Внешний вид -->
-                        <div class="settings-section">
-                            <h4><i class="fas fa-palette"></i> Внешний вид</h4>
-                            
-                            <div class="theme-selector">
-                                <div class="theme-option" data-theme="light">
-                                    <div class="theme-preview light-theme">
-                                        <div class="preview-header"></div>
-                                        <div class="preview-content">
-                                            <div class="preview-message left"></div>
-                                            <div class="preview-message right"></div>
-                                        </div>
-                                    </div>
-                                    <p>Светлая</p>
-                                    <i class="fas fa-check check-icon hidden"></i>
-                                </div>
-                                
-                                <div class="theme-option" data-theme="dark">
-                                    <div class="theme-preview dark-theme">
-                                        <div class="preview-header"></div>
-                                        <div class="preview-content">
-                                            <div class="preview-message left"></div>
-                                            <div class="preview-message right"></div>
-                                        </div>
-                                    </div>
-                                    <p>Тёмная</p>
-                                    <i class="fas fa-check check-icon hidden"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Управление аккаунтом -->
-                        <div class="settings-section">
-                            <h4><i class="fas fa-user-cog"></i> Управление аккаунтом</h4>
-                            
-                            <button id="logout-btn" class="btn btn-danger btn-block">
-                                <i class="fas fa-sign-out-alt"></i> Выйти из аккаунта
-                            </button>
-                            
-                            <div class="settings-info">
-                                <p><i class="fas fa-database"></i> Данные хранятся локально в вашем браузере</p>
-                                <p><i class="fas fa-trash"></i> Очистка данных удалит все чаты и настройки</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div id="home-grid" class="video-grid"></div>
+        <div id="home-load" class="btn ghost" style="margin-top:16px;">Показать ещё</div>
+      </section>
+
+      <section id="watch" class="section">
+        <div class="watch-layout">
+          <div>
+            <div class="player" id="player-box"></div>
+            <div class="comment-box">
+              <h3>Комментарии</h3>
+              <div class="filters">
+                <select id="comment-sort">
+                  <option value="new">Новые</option>
+                  <option value="top">Топ</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <textarea id="comment-input" rows="3" placeholder="Оставьте комментарий"></textarea>
+                <button class="btn primary" id="comment-submit">Комментировать</button>
+              </div>
             </div>
+            <div class="comment-list" id="comment-list"></div>
+          </div>
+          <div>
+            <h3>Следующее</h3>
+            <div id="recommendations" class="list"></div>
+          </div>
         </div>
-        
-        <!-- Скрытые инпуты для загрузки файлов -->
-        <input type="file" id="avatar-input" accept="image/*" class="hidden">
-        <input type="file" id="banner-input" accept="image/*" class="hidden">
-        
-        <!-- Уведомления -->
-        <div id="notification-container"></div>
+      </section>
+
+      <section id="channel" class="section">
+        <div class="channel-hero" id="channel-hero"></div>
+        <div class="tabs">
+          <div class="tab active" data-tab="videos">Видео</div>
+          <div class="tab" data-tab="playlists">Плейлисты</div>
+          <div class="tab" data-tab="about">О канале</div>
+        </div>
+        <div id="channel-content"></div>
+      </section>
+
+      <section id="subscriptions" class="section">
+        <div class="section-title">
+          <h2>Подписки</h2>
+        </div>
+        <div id="subscriptions-grid" class="video-grid"></div>
+      </section>
+
+      <section id="playlists" class="section">
+        <div class="section-title">
+          <h2>Плейлисты</h2>
+          <button class="btn" id="playlist-create">Создать</button>
+        </div>
+        <div id="playlist-list" class="list"></div>
+      </section>
+
+      <section id="history" class="section">
+        <div class="section-title">
+          <h2>История просмотров</h2>
+          <button class="btn" id="history-clear">Очистить</button>
+        </div>
+        <div id="history-list" class="list"></div>
+      </section>
+
+      <section id="search" class="section">
+        <div class="section-title">
+          <h2>Результаты поиска</h2>
+        </div>
+        <div class="filters">
+          <select id="search-date">
+            <option value="all">Все даты</option>
+            <option value="7">Последние 7 дней</option>
+            <option value="30">Последние 30 дней</option>
+          </select>
+          <select id="search-sort">
+            <option value="relevance">Релевантность</option>
+            <option value="new">Новые</option>
+            <option value="popular">Популярные</option>
+          </select>
+        </div>
+        <div id="search-grid" class="video-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="auth-modal">
+    <div class="modal-content">
+      <h3 id="auth-title">Вход</h3>
+      <div class="form-field">
+        <label>Имя пользователя</label>
+        <input type="text" id="auth-username">
+      </div>
+      <div class="form-field">
+        <label>Email</label>
+        <input type="email" id="auth-email">
+      </div>
+      <div class="form-field">
+        <label>Пароль</label>
+        <input type="password" id="auth-password">
+      </div>
+      <div class="filters">
+        <button class="btn" id="auth-toggle">Нет аккаунта? Регистрация</button>
+        <button class="btn primary" id="auth-submit">Продолжить</button>
+      </div>
     </div>
-    
-    <script src="app.js" type="module"></script>
+  </div>
+
+  <div class="modal" id="upload-modal">
+    <div class="modal-content">
+      <h3>Загрузить видео</h3>
+      <div class="form-field">
+        <label>Название</label>
+        <input type="text" id="upload-title">
+      </div>
+      <div class="form-field">
+        <label>Описание</label>
+        <textarea id="upload-description" rows="3"></textarea>
+      </div>
+      <div class="form-field">
+        <label>Теги (через запятую)</label>
+        <input type="text" id="upload-tags">
+      </div>
+      <div class="form-field">
+        <label>Приватность</label>
+        <select id="upload-privacy">
+          <option value="public">Public</option>
+          <option value="unlisted">Unlisted</option>
+          <option value="private">Private</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Видео файл</label>
+        <input type="file" id="upload-file" accept="video/*">
+      </div>
+      <div class="form-field">
+        <label>или URL видео</label>
+        <input type="url" id="upload-url" placeholder="https://">
+      </div>
+      <div class="filters">
+        <button class="btn" id="upload-cancel">Отмена</button>
+        <button class="btn primary" id="upload-submit">Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="playlist-modal">
+    <div class="modal-content">
+      <h3>Новый плейлист</h3>
+      <div class="form-field">
+        <label>Название</label>
+        <input type="text" id="playlist-name">
+      </div>
+      <div class="form-field">
+        <label>Описание</label>
+        <textarea id="playlist-description" rows="3"></textarea>
+      </div>
+      <div class="filters">
+        <button class="btn" id="playlist-cancel">Отмена</button>
+        <button class="btn primary" id="playlist-submit">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="notifications-modal">
+    <div class="modal-content">
+      <h3>Уведомления</h3>
+      <div id="notifications-list" class="list"></div>
+      <button class="btn" id="notifications-close">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'offlineTubeStore';
+    const inMemoryVideoUrls = new Map();
+
+    const generateId = () => {
+      if (window.crypto && crypto.getRandomValues) {
+        const array = new Uint32Array(4);
+        crypto.getRandomValues(array);
+        return Array.from(array, part => part.toString(16).padStart(8, '0')).join('-');
+      }
+      return `id-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+    };
+
+    const pseudoHash = (text) => {
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < text.length; i += 1) {
+        hash ^= text.charCodeAt(i);
+        hash = (hash * 0x01000193) >>> 0;
+      }
+      return hash.toString(16).padStart(8, '0');
+    };
+
+    const store = {
+      users: [],
+      sessions: [],
+      videos: [],
+      comments: [],
+      likes: [],
+      subscriptions: [],
+      playlists: [],
+      watchHistory: [],
+      notifications: [],
+      currentSessionId: null
+    };
+
+    const saveStore = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    };
+
+    const loadStore = () => {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        seedStore();
+        return;
+      }
+      try {
+        const data = JSON.parse(raw);
+        Object.assign(store, data);
+      } catch (error) {
+        console.error('Ошибка чтения хранилища', error);
+        seedStore();
+      }
+    };
+
+    const seedStore = () => {
+      const now = Date.now();
+      const user1 = { id: generateId(), username: 'demo', email: 'demo@offline.tube', passwordHash: pseudoHash('demo123'), channelName: 'Demo Channel', about: 'Канал о демо контенте.' };
+      const user2 = { id: generateId(), username: 'travelgirl', email: 'travel@offline.tube', passwordHash: pseudoHash('travel123'), channelName: 'Travel Girl', about: 'Путешествия и вдохновение.' };
+      const user3 = { id: generateId(), username: 'techlab', email: 'tech@offline.tube', passwordHash: pseudoHash('tech123'), channelName: 'Tech Lab', about: 'Обзоры гаджетов и эксперименты.' };
+
+      const videos = [
+        {
+          id: generateId(),
+          title: 'Ночной таймлапс города',
+          description: 'Красивый таймлапс с крыш мегаполиса.',
+          tags: ['город', 'таймлапс', 'ночь'],
+          channelId: user1.id,
+          channelName: user1.channelName,
+          createdAt: now - 1000 * 60 * 60 * 24 * 2,
+          views: 1520,
+          duration: '8:24',
+          thumbnail: createThumbnail('Night City', '#2b5876', '#4e4376'),
+          privacy: 'public',
+          source: { type: 'url', url: '' }
+        },
+        {
+          id: generateId(),
+          title: 'Гайд по монтажу',
+          description: 'Как быстро сделать стильный ролик.',
+          tags: ['монтаж', 'гайд', 'туториал'],
+          channelId: user3.id,
+          channelName: user3.channelName,
+          createdAt: now - 1000 * 60 * 60 * 24 * 5,
+          views: 9540,
+          duration: '12:10',
+          thumbnail: createThumbnail('Edit Pro', '#314755', '#26a0da'),
+          privacy: 'public',
+          source: { type: 'url', url: '' }
+        },
+        {
+          id: generateId(),
+          title: 'Маршрут по Исландии',
+          description: 'Лучшие локации за 7 дней.',
+          tags: ['путешествия', 'исландия'],
+          channelId: user2.id,
+          channelName: user2.channelName,
+          createdAt: now - 1000 * 60 * 60 * 12,
+          views: 435,
+          duration: '9:02',
+          thumbnail: createThumbnail('Iceland', '#00c6ff', '#0072ff'),
+          privacy: 'public',
+          source: { type: 'url', url: '' }
+        },
+        {
+          id: generateId(),
+          title: 'Уютный лофт тур',
+          description: 'Современный дизайн и умные решения.',
+          tags: ['дизайн', 'дом', 'лофт'],
+          channelId: user1.id,
+          channelName: user1.channelName,
+          createdAt: now - 1000 * 60 * 60 * 36,
+          views: 3200,
+          duration: '6:18',
+          thumbnail: createThumbnail('Loft', '#fa709a', '#fee140'),
+          privacy: 'public',
+          source: { type: 'url', url: '' }
+        },
+        {
+          id: generateId(),
+          title: 'Техно обзор: наушники',
+          description: 'Разбираем звук, комфорт и батарею.',
+          tags: ['техно', 'обзор', 'наушники'],
+          channelId: user3.id,
+          channelName: user3.channelName,
+          createdAt: now - 1000 * 60 * 60 * 80,
+          views: 7780,
+          duration: '10:45',
+          thumbnail: createThumbnail('Headphones', '#141E30', '#243B55'),
+          privacy: 'public',
+          source: { type: 'url', url: '' }
+        },
+        {
+          id: generateId(),
+          title: 'Hidden beach vlog',
+          description: 'Unlisted ролик: приватный пляж.',
+          tags: ['vlog', 'пляж'],
+          channelId: user2.id,
+          channelName: user2.channelName,
+          createdAt: now - 1000 * 60 * 60 * 90,
+          views: 120,
+          duration: '4:55',
+          thumbnail: createThumbnail('Beach', '#f46b45', '#eea849'),
+          privacy: 'unlisted',
+          source: { type: 'url', url: '' }
+        }
+      ];
+
+      store.users = [user1, user2, user3];
+      store.videos = videos;
+      store.comments = [];
+      store.likes = [];
+      store.subscriptions = [{ id: generateId(), subscriberId: user1.id, channelId: user2.id }];
+      store.playlists = [{ id: generateId(), userId: user1.id, name: 'Избранное', description: 'Лучшее', videoIds: [videos[0].id, videos[2].id] }];
+      store.watchHistory = [];
+      store.notifications = [];
+      store.sessions = [];
+      store.currentSessionId = null;
+      saveStore();
+    };
+
+    const createThumbnail = (label, start, end) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 640;
+      canvas.height = 360;
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 640, 360);
+      gradient.addColorStop(0, start);
+      gradient.addColorStop(1, end);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 36px sans-serif';
+      ctx.fillText(label, 40, 180);
+      ctx.font = '16px sans-serif';
+      ctx.fillText('OfflineTube', 40, 220);
+      return canvas.toDataURL('image/png');
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    const state = {
+      currentRoute: 'home',
+      currentVideoId: null,
+      homeCursor: 0,
+      homeChunk: 6,
+      searchQuery: ''
+    };
+
+    const currentUser = () => {
+      const session = store.sessions.find(s => s.id === store.currentSessionId);
+      if (!session) return null;
+      return store.users.find(u => u.id === session.userId) || null;
+    };
+
+    const requireAuth = () => {
+      if (!currentUser()) {
+        openAuthModal();
+        showToast('Нужно войти в аккаунт');
+        return false;
+      }
+      return true;
+    };
+
+    const showToast = (message) => {
+      const toast = $('#toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    };
+
+    const formatDate = (timestamp) => new Date(timestamp).toLocaleDateString('ru-RU');
+
+    const formatViews = (views) => views.toLocaleString('ru-RU');
+
+    const renderNav = (route) => {
+      state.currentRoute = route;
+      $$('.nav-link').forEach(link => link.classList.toggle('active', link.dataset.route === route));
+      $$('.section').forEach(section => section.classList.toggle('active', section.id === route));
+    };
+
+    const pushRoute = (route, params = {}) => {
+      const url = new URL(window.location);
+      url.hash = route === 'watch' ? `watch?id=${params.id}` : route;
+      window.history.pushState({ route, params }, '', url);
+      openRoute(route, params);
+    };
+
+    const openRoute = (route, params = {}) => {
+      renderNav(route);
+      if (route === 'home') renderHome();
+      if (route === 'watch') renderWatch(params.id);
+      if (route === 'subscriptions') renderSubscriptions();
+      if (route === 'playlists') renderPlaylists();
+      if (route === 'history') renderHistory();
+      if (route === 'search') renderSearch();
+      if (route === 'channel') renderChannel(params.id);
+    };
+
+    const getVideoById = (id) => store.videos.find(video => video.id === id);
+
+    const renderVideoCard = (video) => {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <img class="video-thumb" src="${video.thumbnail}" alt="${video.title}">
+        <div class="video-info">
+          <strong>${video.title}</strong>
+          <div class="video-meta">${video.channelName} • ${formatViews(video.views)} просмотров • ${formatDate(video.createdAt)}</div>
+          <div class="video-meta">${video.duration} • ${video.privacy}</div>
+        </div>
+      `;
+      card.addEventListener('click', () => pushRoute('watch', { id: video.id }));
+      return card;
+    };
+
+    const getSortedVideos = (videos, mode) => {
+      const copy = [...videos];
+      if (mode === 'popular') {
+        return copy.sort((a, b) => b.views - a.views);
+      }
+      return copy.sort((a, b) => b.createdAt - a.createdAt);
+    };
+
+    const getFeedVideos = () => store.videos.filter(video => video.privacy === 'public');
+
+    const renderHome = () => {
+      const sortMode = $('#home-sort').value;
+      const feed = getSortedVideos(getFeedVideos(), sortMode);
+      const start = 0;
+      state.homeCursor = state.homeChunk;
+      const grid = $('#home-grid');
+      grid.innerHTML = '';
+      feed.slice(start, state.homeCursor).forEach(video => grid.appendChild(renderVideoCard(video)));
+      $('#home-load').classList.toggle('hidden', state.homeCursor >= feed.length);
+    };
+
+    const loadMoreHome = () => {
+      const sortMode = $('#home-sort').value;
+      const feed = getSortedVideos(getFeedVideos(), sortMode);
+      const grid = $('#home-grid');
+      const next = feed.slice(state.homeCursor, state.homeCursor + state.homeChunk);
+      next.forEach(video => grid.appendChild(renderVideoCard(video)));
+      state.homeCursor += state.homeChunk;
+      $('#home-load').classList.toggle('hidden', state.homeCursor >= feed.length);
+    };
+
+    const renderPlayer = (video) => {
+      const box = $('#player-box');
+      box.innerHTML = `
+        <h2>${video.title}</h2>
+        <div class="muted">${video.channelName} • ${formatViews(video.views)} просмотров • ${formatDate(video.createdAt)}</div>
+        <div style="margin:12px 0;">
+          ${renderVideoSource(video)}
+        </div>
+        <div class="player-actions">
+          <button class="btn" id="like-btn">👍 Лайк (<span id="like-count">${countLikes(video.id)}</span>)</button>
+          <button class="btn" id="watch-later">⏰ Смотреть позже</button>
+          <button class="btn" id="add-playlist">➕ В плейлист</button>
+          <button class="btn" id="share-btn">🔗 Поделиться</button>
+          <button class="btn" id="open-channel">📺 Канал</button>
+        </div>
+        <p style="margin-top:12px;">${video.description}</p>
+        <div class="muted">Теги: ${video.tags.map(tag => `#${tag}`).join(' ')}</div>
+      `;
+
+      $('#like-btn').addEventListener('click', () => toggleLike(video.id));
+      $('#add-playlist').addEventListener('click', () => addVideoToPlaylist(video.id));
+      $('#share-btn').addEventListener('click', () => {
+        const link = `${location.origin}${location.pathname}#watch?id=${video.id}`;
+        navigator.clipboard?.writeText(link).then(() => showToast('Ссылка скопирована')).catch(() => showToast('Скопируйте вручную'));
+      });
+      $('#watch-later').addEventListener('click', () => addToWatchLater(video.id));
+      $('#open-channel').addEventListener('click', () => pushRoute('channel', { id: video.channelId }));
+    };
+
+    const renderVideoSource = (video) => {
+      if (video.source.type === 'file' && inMemoryVideoUrls.has(video.id)) {
+        return `<video controls src="${inMemoryVideoUrls.get(video.id)}"></video>`;
+      }
+      if (video.source.type === 'url' && video.source.url) {
+        return `<video controls src="${video.source.url}"></video>`;
+      }
+      return `<div class="pill">Видео загружено локально, перезагрузите файл для просмотра</div>`;
+    };
+
+    const countLikes = (videoId) => store.likes.filter(like => like.videoId === videoId).length;
+
+    const toggleLike = (videoId) => {
+      if (!requireAuth()) return;
+      const user = currentUser();
+      const existing = store.likes.find(like => like.videoId === videoId && like.userId === user.id);
+      if (existing) {
+        store.likes = store.likes.filter(like => like !== existing);
+      } else {
+        store.likes.push({ id: generateId(), videoId, userId: user.id, createdAt: Date.now() });
+      }
+      saveStore();
+      $('#like-count').textContent = countLikes(videoId);
+    };
+
+    const addToWatchLater = (videoId) => {
+      if (!requireAuth()) return;
+      const user = currentUser();
+      let playlist = store.playlists.find(list => list.userId === user.id && list.name === 'Смотреть позже');
+      if (!playlist) {
+        playlist = { id: generateId(), userId: user.id, name: 'Смотреть позже', description: '', videoIds: [] };
+        store.playlists.push(playlist);
+      }
+      if (!playlist.videoIds.includes(videoId)) {
+        playlist.videoIds.push(videoId);
+        saveStore();
+        showToast('Добавлено в смотреть позже');
+      }
+    };
+
+    const renderComments = (videoId) => {
+      const sort = $('#comment-sort').value;
+      const comments = store.comments.filter(comment => comment.videoId === videoId && !comment.parentId);
+      const sorted = [...comments].sort((a, b) => sort === 'top' ? b.likes - a.likes : b.createdAt - a.createdAt);
+      const container = $('#comment-list');
+      container.innerHTML = '';
+      sorted.forEach(comment => {
+        const user = store.users.find(u => u.id === comment.userId);
+        const replies = store.comments.filter(reply => reply.parentId === comment.id);
+        const node = document.createElement('div');
+        node.className = 'comment';
+        node.innerHTML = `
+          <strong>${user ? user.username : 'Неизвестно'}</strong>
+          <div>${comment.text}</div>
+          <div class="meta">${formatDate(comment.createdAt)} • 👍 ${comment.likes}</div>
+          <div class="comment-actions">
+            <button class="btn ghost" data-reply="${comment.id}">Ответить</button>
+            <button class="btn ghost" data-like-comment="${comment.id}">👍</button>
+          </div>
+          <div class="comment-replies"></div>
+        `;
+        const repliesBox = node.querySelector('.comment-replies');
+        replies.forEach(reply => {
+          const replyUser = store.users.find(u => u.id === reply.userId);
+          const replyNode = document.createElement('div');
+          replyNode.className = 'comment';
+          replyNode.innerHTML = `
+            <strong>${replyUser ? replyUser.username : 'Неизвестно'}</strong>
+            <div>${reply.text}</div>
+            <div class="meta">${formatDate(reply.createdAt)} • 👍 ${reply.likes}</div>
+          `;
+          repliesBox.appendChild(replyNode);
+        });
+        container.appendChild(node);
+      });
+
+      container.querySelectorAll('[data-reply]').forEach(btn => {
+        btn.addEventListener('click', () => promptReply(videoId, btn.dataset.reply));
+      });
+      container.querySelectorAll('[data-like-comment]').forEach(btn => {
+        btn.addEventListener('click', () => likeComment(btn.dataset.likeComment));
+      });
+    };
+
+    const promptReply = (videoId, parentId) => {
+      if (!requireAuth()) return;
+      const text = prompt('Ваш ответ:');
+      if (!text) return;
+      store.comments.push({ id: generateId(), videoId, userId: currentUser().id, parentId, text, createdAt: Date.now(), likes: 0 });
+      saveStore();
+      renderComments(videoId);
+    };
+
+    const likeComment = (commentId) => {
+      if (!requireAuth()) return;
+      const comment = store.comments.find(c => c.id === commentId);
+      if (comment) {
+        comment.likes += 1;
+        saveStore();
+        renderComments(state.currentVideoId);
+      }
+    };
+
+    const addComment = () => {
+      if (!requireAuth()) return;
+      const text = $('#comment-input').value.trim();
+      if (!text) {
+        showToast('Комментарий не может быть пустым');
+        return;
+      }
+      store.comments.push({ id: generateId(), videoId: state.currentVideoId, userId: currentUser().id, parentId: null, text, createdAt: Date.now(), likes: 0 });
+      $('#comment-input').value = '';
+      saveStore();
+      renderComments(state.currentVideoId);
+    };
+
+    const renderRecommendations = (video) => {
+      const tags = new Set(video.tags);
+      const recs = store.videos.filter(v => v.id !== video.id && (v.channelId === video.channelId || v.tags.some(tag => tags.has(tag))) && v.privacy !== 'private');
+      const container = $('#recommendations');
+      container.innerHTML = '';
+      recs.slice(0, 6).forEach(rec => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+          <div>
+            <strong>${rec.title}</strong>
+            <div class="muted">${rec.channelName}</div>
+          </div>
+          <button class="btn">Смотреть</button>
+        `;
+        item.querySelector('button').addEventListener('click', () => pushRoute('watch', { id: rec.id }));
+        container.appendChild(item);
+      });
+    };
+
+    const renderWatch = (id) => {
+      const video = getVideoById(id);
+      if (!video || (video.privacy === 'private' && video.channelId !== currentUser()?.id)) {
+        showToast('Видео недоступно');
+        pushRoute('home');
+        return;
+      }
+      state.currentVideoId = id;
+      video.views += 1;
+      updateHistory(video.id);
+      saveStore();
+      renderPlayer(video);
+      renderComments(video.id);
+      renderRecommendations(video);
+    };
+
+    const updateHistory = (videoId) => {
+      const user = currentUser();
+      if (!user) return;
+      store.watchHistory = store.watchHistory.filter(item => !(item.userId === user.id && item.videoId === videoId));
+      store.watchHistory.unshift({ id: generateId(), userId: user.id, videoId, watchedAt: Date.now() });
+      saveStore();
+    };
+
+    const renderSubscriptions = () => {
+      const user = currentUser();
+      if (!user) {
+        $('#subscriptions-grid').innerHTML = '<div class="muted">Войдите, чтобы видеть подписки.</div>';
+        return;
+      }
+      const subscribed = store.subscriptions.filter(sub => sub.subscriberId === user.id).map(sub => sub.channelId);
+      const videos = store.videos.filter(video => subscribed.includes(video.channelId) && video.privacy !== 'private');
+      const grid = $('#subscriptions-grid');
+      grid.innerHTML = '';
+      videos.forEach(video => grid.appendChild(renderVideoCard(video)));
+    };
+
+    const renderPlaylists = () => {
+      const user = currentUser();
+      const list = $('#playlist-list');
+      list.innerHTML = '';
+      if (!user) {
+        list.innerHTML = '<div class="muted">Войдите, чтобы управлять плейлистами.</div>';
+        return;
+      }
+      store.playlists.filter(pl => pl.userId === user.id).forEach(pl => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+          <div>
+            <strong>${pl.name}</strong>
+            <div class="muted">${pl.description}</div>
+          </div>
+          <button class="btn">Открыть</button>
+        `;
+        item.querySelector('button').addEventListener('click', () => openPlaylist(pl.id));
+        list.appendChild(item);
+      });
+    };
+
+    const openPlaylist = (playlistId) => {
+      const playlist = store.playlists.find(pl => pl.id === playlistId);
+      if (!playlist) return;
+      const videos = playlist.videoIds.map(getVideoById).filter(Boolean);
+      const container = document.createElement('div');
+      container.className = 'list';
+      videos.forEach(video => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+          <div>
+            <strong>${video.title}</strong>
+            <div class="muted">${video.channelName}</div>
+          </div>
+          <div>
+            <button class="btn" data-watch>▶ Смотреть</button>
+            <button class="btn" data-remove>Удалить</button>
+          </div>
+        `;
+        item.querySelector('[data-watch]').addEventListener('click', () => pushRoute('watch', { id: video.id }));
+        item.querySelector('[data-remove]').addEventListener('click', () => removeFromPlaylist(playlist.id, video.id));
+        container.appendChild(item);
+      });
+      $('#playlist-list').innerHTML = `
+        <div class="list-item">
+          <div>
+            <strong>${playlist.name}</strong>
+            <div class="muted">${playlist.description}</div>
+          </div>
+          <button class="btn" id="playlist-back">Назад</button>
+        </div>
+      `;
+      $('#playlist-list').appendChild(container);
+      $('#playlist-back').addEventListener('click', renderPlaylists);
+    };
+
+    const removeFromPlaylist = (playlistId, videoId) => {
+      const playlist = store.playlists.find(pl => pl.id === playlistId);
+      if (!playlist) return;
+      playlist.videoIds = playlist.videoIds.filter(id => id !== videoId);
+      saveStore();
+      openPlaylist(playlistId);
+    };
+
+    const renderHistory = () => {
+      const user = currentUser();
+      const list = $('#history-list');
+      list.innerHTML = '';
+      if (!user) {
+        list.innerHTML = '<div class="muted">Войдите, чтобы видеть историю.</div>';
+        return;
+      }
+      store.watchHistory.filter(item => item.userId === user.id).forEach(item => {
+        const video = getVideoById(item.videoId);
+        if (!video) return;
+        const row = document.createElement('div');
+        row.className = 'list-item';
+        row.innerHTML = `
+          <div>
+            <strong>${video.title}</strong>
+            <div class="muted">${formatDate(item.watchedAt)}</div>
+          </div>
+          <button class="btn">Смотреть</button>
+        `;
+        row.querySelector('button').addEventListener('click', () => pushRoute('watch', { id: video.id }));
+        list.appendChild(row);
+      });
+    };
+
+    const renderSearch = () => {
+      const query = state.searchQuery.toLowerCase();
+      const dateFilter = $('#search-date').value;
+      const sort = $('#search-sort').value;
+      const now = Date.now();
+      let results = store.videos.filter(video => {
+        const text = `${video.title} ${video.description} ${video.tags.join(' ')} ${video.channelName}`.toLowerCase();
+        const matches = text.includes(query);
+        if (!matches) return false;
+        if (video.privacy === 'private') return false;
+        if (dateFilter !== 'all') {
+          const days = parseInt(dateFilter, 10);
+          return (now - video.createdAt) <= days * 24 * 60 * 60 * 1000;
+        }
+        return true;
+      });
+
+      if (sort === 'new') {
+        results = results.sort((a, b) => b.createdAt - a.createdAt);
+      } else if (sort === 'popular') {
+        results = results.sort((a, b) => b.views - a.views);
+      } else {
+        results = results.sort((a, b) => b.views + b.createdAt - (a.views + a.createdAt));
+      }
+
+      const grid = $('#search-grid');
+      grid.innerHTML = '';
+      results.forEach(video => grid.appendChild(renderVideoCard(video)));
+    };
+
+    const renderChannel = (channelId) => {
+      const channel = store.users.find(user => user.id === channelId);
+      if (!channel) return;
+      const hero = $('#channel-hero');
+      const user = currentUser();
+      const isSubscribed = user && store.subscriptions.some(sub => sub.subscriberId === user.id && sub.channelId === channelId);
+      hero.dataset.channelId = channelId;
+      hero.innerHTML = `
+        <div>
+          <h2>${channel.channelName}</h2>
+          <div class="muted">@${channel.username}</div>
+          <div>${channel.about || 'Описания пока нет.'}</div>
+        </div>
+        <button class="btn" id="subscribe-btn">${isSubscribed ? 'Отписаться' : 'Подписаться'}</button>
+      `;
+      $('#subscribe-btn').addEventListener('click', () => toggleSubscription(channelId));
+
+      const activeTab = $('.tab.active')?.dataset.tab || 'videos';
+      renderChannelTab(channelId, activeTab);
+    };
+
+    const renderChannelTab = (channelId, tab) => {
+      const content = $('#channel-content');
+      content.innerHTML = '';
+      if (tab === 'videos') {
+        const videos = store.videos.filter(video => video.channelId === channelId && video.privacy !== 'private');
+        const grid = document.createElement('div');
+        grid.className = 'video-grid';
+        videos.forEach(video => grid.appendChild(renderVideoCard(video)));
+        content.appendChild(grid);
+      }
+      if (tab === 'playlists') {
+        const playlists = store.playlists.filter(pl => pl.userId === channelId);
+        playlists.forEach(pl => {
+          const item = document.createElement('div');
+          item.className = 'list-item';
+          item.innerHTML = `
+            <div>
+              <strong>${pl.name}</strong>
+              <div class="muted">${pl.description}</div>
+            </div>
+            <button class="btn">Открыть</button>
+          `;
+          item.querySelector('button').addEventListener('click', () => openPlaylist(pl.id));
+          content.appendChild(item);
+        });
+      }
+      if (tab === 'about') {
+        const channel = store.users.find(user => user.id === channelId);
+        content.innerHTML = `<div class="list-item">${channel?.about || 'Нет описания.'}</div>`;
+      }
+    };
+
+    const toggleSubscription = (channelId) => {
+      if (!requireAuth()) return;
+      const user = currentUser();
+      const existing = store.subscriptions.find(sub => sub.subscriberId === user.id && sub.channelId === channelId);
+      if (existing) {
+        store.subscriptions = store.subscriptions.filter(sub => sub !== existing);
+        showToast('Подписка отменена');
+      } else {
+        store.subscriptions.push({ id: generateId(), subscriberId: user.id, channelId });
+        showToast('Вы подписались');
+      }
+      saveStore();
+      renderChannel(channelId);
+    };
+
+    const updateAuthUI = () => {
+      const user = currentUser();
+      const button = $('#auth-btn');
+      if (user) {
+        button.textContent = `@${user.username}`;
+      } else {
+        button.textContent = 'Войти';
+      }
+      updateNotifications();
+    };
+
+    const openAuthModal = () => {
+      $('#auth-modal').classList.add('active');
+      $('#auth-email').parentElement.style.display = authMode === 'register' ? 'grid' : 'none';
+      $('#auth-title').textContent = authMode === 'register' ? 'Регистрация' : 'Вход';
+      $('#auth-submit').textContent = authMode === 'register' ? 'Создать аккаунт' : 'Войти';
+    };
+
+    let authMode = 'login';
+
+    const toggleAuthMode = () => {
+      authMode = authMode === 'login' ? 'register' : 'login';
+      openAuthModal();
+    };
+
+    const submitAuth = () => {
+      const username = $('#auth-username').value.trim();
+      const email = $('#auth-email').value.trim();
+      const password = $('#auth-password').value.trim();
+      if (authMode === 'register') {
+        if (!username || !email || !password) {
+          showToast('Заполните все поля');
+          return;
+        }
+        if (store.users.some(user => user.username === username || user.email === email)) {
+          showToast('Пользователь уже существует');
+          return;
+        }
+        const user = { id: generateId(), username, email, passwordHash: pseudoHash(password), channelName: username, about: '' };
+        store.users.push(user);
+        showToast('Аккаунт создан');
+      }
+      const found = store.users.find(user => user.username === username && user.passwordHash === pseudoHash(password));
+      if (!found) {
+        showToast('Неверные данные');
+        return;
+      }
+      const session = { id: generateId(), userId: found.id, createdAt: Date.now() };
+      store.sessions.push(session);
+      store.currentSessionId = session.id;
+      saveStore();
+      $('#auth-modal').classList.remove('active');
+      updateAuthUI();
+      renderSubscriptions();
+      renderPlaylists();
+      renderHistory();
+    };
+
+    const logout = () => {
+      store.currentSessionId = null;
+      saveStore();
+      updateAuthUI();
+      showToast('Вы вышли');
+    };
+
+    const openUploadModal = () => {
+      if (!requireAuth()) return;
+      $('#upload-modal').classList.add('active');
+    };
+
+    const submitUpload = () => {
+      if (!requireAuth()) return;
+      const title = $('#upload-title').value.trim();
+      const description = $('#upload-description').value.trim();
+      const tags = $('#upload-tags').value.split(',').map(tag => tag.trim()).filter(Boolean);
+      const privacy = $('#upload-privacy').value;
+      const file = $('#upload-file').files[0];
+      const url = $('#upload-url').value.trim();
+      if (!title || (!file && !url)) {
+        showToast('Нужно указать название и файл/ссылку');
+        return;
+      }
+      const user = currentUser();
+      const videoId = generateId();
+      if (file) {
+        const objectUrl = URL.createObjectURL(file);
+        inMemoryVideoUrls.set(videoId, objectUrl);
+      }
+      const video = {
+        id: videoId,
+        title,
+        description,
+        tags,
+        channelId: user.id,
+        channelName: user.channelName,
+        createdAt: Date.now(),
+        views: 0,
+        duration: file ? 'Видео' : 'Ссылка',
+        thumbnail: createThumbnail(title.slice(0, 12), '#4b6cb7', '#182848'),
+        privacy,
+        source: { type: file ? 'file' : 'url', url: url || '' }
+      };
+      store.videos.unshift(video);
+      notifySubscribers(video);
+      saveStore();
+      $('#upload-modal').classList.remove('active');
+      clearUploadForm();
+      renderHome();
+      showToast('Видео добавлено');
+    };
+
+    const clearUploadForm = () => {
+      $('#upload-title').value = '';
+      $('#upload-description').value = '';
+      $('#upload-tags').value = '';
+      $('#upload-privacy').value = 'public';
+      $('#upload-file').value = '';
+      $('#upload-url').value = '';
+    };
+
+    const notifySubscribers = (video) => {
+      const subs = store.subscriptions.filter(sub => sub.channelId === video.channelId);
+      subs.forEach(sub => {
+        store.notifications.push({
+          id: generateId(),
+          userId: sub.subscriberId,
+          text: `Новое видео от ${video.channelName}: ${video.title}`,
+          createdAt: Date.now(),
+          videoId: video.id,
+          read: false
+        });
+      });
+    };
+
+    const updateNotifications = () => {
+      const user = currentUser();
+      const count = $('#notif-count');
+      if (!user) {
+        count.classList.add('hidden');
+        return;
+      }
+      const unread = store.notifications.filter(notif => notif.userId === user.id && !notif.read);
+      count.textContent = unread.length;
+      count.classList.toggle('hidden', unread.length === 0);
+    };
+
+    const openNotifications = () => {
+      if (!requireAuth()) return;
+      const user = currentUser();
+      const list = $('#notifications-list');
+      list.innerHTML = '';
+      const userNotifs = store.notifications.filter(notif => notif.userId === user.id).sort((a, b) => b.createdAt - a.createdAt);
+      userNotifs.forEach(notif => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.innerHTML = `
+          <div>
+            <strong>${notif.text}</strong>
+            <div class="muted">${formatDate(notif.createdAt)}</div>
+          </div>
+          <button class="btn">Смотреть</button>
+        `;
+        item.querySelector('button').addEventListener('click', () => {
+          notif.read = true;
+          saveStore();
+          $('#notifications-modal').classList.remove('active');
+          pushRoute('watch', { id: notif.videoId });
+        });
+        list.appendChild(item);
+        notif.read = true;
+      });
+      saveStore();
+      $('#notifications-modal').classList.add('active');
+      updateNotifications();
+    };
+
+    const createPlaylist = () => {
+      if (!requireAuth()) return;
+      const name = $('#playlist-name').value.trim();
+      const description = $('#playlist-description').value.trim();
+      if (!name) {
+        showToast('Введите название');
+        return;
+      }
+      store.playlists.push({ id: generateId(), userId: currentUser().id, name, description, videoIds: [] });
+      saveStore();
+      $('#playlist-modal').classList.remove('active');
+      $('#playlist-name').value = '';
+      $('#playlist-description').value = '';
+      renderPlaylists();
+    };
+
+    const addVideoToPlaylist = (videoId) => {
+      if (!requireAuth()) return;
+      const playlists = store.playlists.filter(pl => pl.userId === currentUser().id);
+      const name = prompt(`Добавить в плейлист: ${playlists.map(pl => pl.name).join(', ')}`);
+      const playlist = playlists.find(pl => pl.name === name);
+      if (!playlist) return;
+      if (!playlist.videoIds.includes(videoId)) {
+        playlist.videoIds.push(videoId);
+        saveStore();
+        showToast('Видео добавлено в плейлист');
+      }
+    };
+
+    const handleHistoryClear = () => {
+      if (!requireAuth()) return;
+      const user = currentUser();
+      store.watchHistory = store.watchHistory.filter(item => item.userId !== user.id);
+      saveStore();
+      renderHistory();
+      showToast('История очищена');
+    };
+
+    const handleSearch = () => {
+      const query = $('#global-search').value.trim();
+      if (!query) return;
+      state.searchQuery = query;
+      pushRoute('search');
+      renderSearch();
+    };
+
+    const initEvents = () => {
+      $$('.nav-link').forEach(link => link.addEventListener('click', () => pushRoute(link.dataset.route)));
+      $('#home-sort').addEventListener('change', renderHome);
+      $('#home-load').addEventListener('click', loadMoreHome);
+      $('#comment-submit').addEventListener('click', addComment);
+      $('#comment-sort').addEventListener('change', () => renderComments(state.currentVideoId));
+      $('#auth-btn').addEventListener('click', () => {
+        if (currentUser()) {
+          if (confirm('Выйти из аккаунта?')) logout();
+        } else {
+          openAuthModal();
+        }
+      });
+      $('#auth-toggle').addEventListener('click', toggleAuthMode);
+      $('#auth-submit').addEventListener('click', submitAuth);
+      $('#upload-btn').addEventListener('click', openUploadModal);
+      $('#upload-cancel').addEventListener('click', () => $('#upload-modal').classList.remove('active'));
+      $('#upload-submit').addEventListener('click', submitUpload);
+      $('#playlist-create').addEventListener('click', () => $('#playlist-modal').classList.add('active'));
+      $('#playlist-cancel').addEventListener('click', () => $('#playlist-modal').classList.remove('active'));
+      $('#playlist-submit').addEventListener('click', createPlaylist);
+      $('#history-clear').addEventListener('click', handleHistoryClear);
+      $('#search-btn').addEventListener('click', handleSearch);
+      $('#global-search').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') handleSearch();
+      });
+      $('#search-date').addEventListener('change', renderSearch);
+      $('#search-sort').addEventListener('change', renderSearch);
+      $('#notifications-btn').addEventListener('click', openNotifications);
+      $('#notifications-close').addEventListener('click', () => $('#notifications-modal').classList.remove('active'));
+      $$('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          $$('.tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const channelId = $('#channel-hero').dataset.channelId;
+          renderChannelTab(channelId, tab.dataset.tab);
+        });
+      });
+      window.addEventListener('hashchange', handleHashRoute);
+      window.addEventListener('popstate', (event) => {
+        if (event.state?.route) {
+          openRoute(event.state.route, event.state.params || {});
+        }
+      });
+      document.body.addEventListener('click', (event) => {
+        if (event.target.matches('.video-card')) return;
+        if (event.target.matches('.modal')) event.target.classList.remove('active');
+      });
+      $('#player-box').addEventListener('dblclick', () => addVideoToPlaylist(state.currentVideoId));
+    };
+
+    const handleHashRoute = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash.startsWith('watch')) {
+        const params = new URLSearchParams(hash.split('?')[1]);
+        const id = params.get('id');
+        if (id) {
+          openRoute('watch', { id });
+          return;
+        }
+      }
+      if (hash) {
+        openRoute(hash);
+      }
+    };
+
+    loadStore();
+    updateAuthUI();
+    initEvents();
+    renderHome();
+    handleHashRoute();
+  </script>
 </body>
 </html>
